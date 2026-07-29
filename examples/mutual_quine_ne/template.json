@@ -1,0 +1,10 @@
+[
+  {
+    "node-id": "__ENCLAVE1",
+    "code": "# ========== BODY ========== \nlet\n  peers = builtins.filter (n: n != __nixreflect_self_id__) __nixreflect_node_ids__;\n  peer = builtins.head peers;\nin\n{\n  self = __nixreflect_self_id__;\n  inherit peer;\n  selfSource = __nixreflect_render__ __nixreflect_self_id__;\n  peerSource = __nixreflect_render__ peer;\n  peerSourceSha256 = builtins.hashString \"sha256\" (__nixreflect_render__ peer);\n}"
+  },
+  {
+    "node-id": "__ENCLAVE2",
+    "code": "# ========== BODY ========== \nlet\n  peers = builtins.filter (n: n != __nixreflect_self_id__) __nixreflect_node_ids__;\n  peer = builtins.head peers;\nin\n{\n  self = __nixreflect_self_id__;\n  inherit peer;\n  selfSource = __nixreflect_render__ __nixreflect_self_id__;\n  peerSource = __nixreflect_render__ peer;\n  peerSourceSha256 = builtins.hashString \"sha256\" (__nixreflect_render__ peer);\n}"
+  }
+]

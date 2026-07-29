@@ -1,0 +1,10 @@
+[
+  {
+    "node-id": "__NODE1",
+    "code": "# ========== BODY ========== \nbuiltins.hashString \"sha256\" __NODE2"
+  },
+  {
+    "node-id": "__NODE2",
+    "code": "# ========== BODY ========== \nbuiltins.hashString \"sha256\" __NODE1"
+  }
+]

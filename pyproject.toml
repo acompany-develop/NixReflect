@@ -1,0 +1,31 @@
+[project]
+name = "NixReflect"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">= 3.12"
+license = "MIT"
+dependencies = []
+
+[project.scripts]
+nixreflect = "nixreflect.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.30"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nixreflect"]
+
+[tool.ruff]
+target-version = "py312"
+
+[dependency-groups]
+dev = ["ruff>=0.15.4"]
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "PL", "SIM", "TC", "W"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
