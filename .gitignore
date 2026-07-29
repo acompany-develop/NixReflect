@@ -1,3 +1,21 @@
+# Transpiler output
+manifest.json
+node__*.nix
+
+# Exceptions
+!examples/*/manifest.json
+!examples/*/node__*.nix
+
+# Nix build results
+result
+result-*
+eif1
+eif2
+nodes
+
+# System
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
