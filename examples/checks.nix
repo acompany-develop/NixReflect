@@ -4,11 +4,12 @@
 #      (drift detection),
 #   3. evaluate the emitted nodes with nix-instantiate and assert the
 #      quine property they claim (self-reproduction / peer digests).
-# The mutual_quine_ne example has its own, much stronger checks in
-# ./mutual_quine_ne/default.nix (EIF reconstruction).
+# The mutual_quine_ne_{sha,pcrs} examples have their own, much stronger
+# checks in ./mutual_quine_ne_sha/default.nix (peer source digest) and
+# ./mutual_quine_ne_pcrs/default.nix (EIF reconstruction).
 { pkgs }:
 let
-  # >= 3.12 for PEP 695; keep in sync with mutual_quine_ne/default.nix
+  # >= 3.12 for PEP 695; keep in sync with mutual_quine_ne_{sha,pcrs}/default.nix
   transpiled = name: pkgs.runCommand "nixreflect-${name}-transpiled"
     { nativeBuildInputs = [ pkgs.python312 ]; } ''
     export PYTHONPATH=${../src}
@@ -17,7 +18,7 @@ let
   '';
 
   # nix-instantiate performs pure evaluation only, but still wants writable
-  # state and cache locations (same trick as mutual_quine_ne/run.sh)
+  # state and cache locations (same trick as mutual_quine_ne_pcrs/run.sh)
   check = name: script: pkgs.runCommand "nixreflect-e2e-${name}"
     { nativeBuildInputs = [ pkgs.nix pkgs.jq ]; } ''
     export HOME="$TMPDIR/home" XDG_CACHE_HOME="$TMPDIR/cache" \

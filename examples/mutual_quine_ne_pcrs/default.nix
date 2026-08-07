@@ -1,4 +1,4 @@
-# NixReflect mutual quine on AWS Nitro Enclaves.
+# NixReflect mutual quine on AWS Nitro Enclaves -- PCRs edition.
 #
 # Builds two enclave images whose node-specific parts are /app/node.nix (user
 # ramdisk) and /node-id (bootstrap ramdisk); every other build input is
