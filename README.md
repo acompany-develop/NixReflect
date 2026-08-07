@@ -125,12 +125,20 @@ nix eval --raw -f examples/trinity_quine/node___NODE3.nix; echo
 sha256sum examples/trinity_quine/*.nix
 ```
 
-### mutual_quine_ne — mutual quine as AWS Nitro Enclaves
+### mutual_quine_ne_sha — mutual quine as AWS Nitro Enclaves (source digests)
 
-Two **Nitro Enclave images** (EIFs), built reproducibly with [monzo/aws-nitro-util](https://github.com/monzo/aws-nitro-util), each of which *rebuilds the other enclave's image inside itself at runtime* and prints the peer's reference **PCR values** — the measurements the Nitro hypervisor attests — derived intrinsically, with no network and no shared state.
+Two **Nitro Enclave images** (EIFs), built with [monzo/aws-nitro-util](https://github.com/monzo/aws-nitro-util), that differ in exactly one file — the quine node — and at runtime *each reconstructs the other's exact Nix source and prints its SHA-384 digest*, with no network and no shared state.
+Nothing is rebuilt inside the enclave: this is the Kleene fixed point of `mutual_quine`, demonstrated in isolation on Nitro hardware, and the gentle on-ramp to the full PCR reconstruction below.
 
-Unlike the examples above, running this one requires an **EC2 instance with AWS Nitro Enclaves enabled** and ample resources — it builds the EIFs on the host and each enclave rebuilds its peer's EIF in RAM (the tested setups are `m6a.xlarge` for x86\_64 and `m6g.xlarge` for AArch64: 4 vCPUs / 16 GiB, of which 2 vCPUs / 8 GiB go to the enclave).
-See the full tutorial in [`examples/mutual_quine_ne/`](examples/mutual_quine_ne/README.md) for the instance prerequisites, host setup, and a step-by-step walk-through.
+Unlike the examples above, running it requires an **EC2 instance with AWS Nitro Enclaves enabled**, but only modest resources (~2 GiB of enclave memory).
+See the tutorial in [`examples/mutual_quine_ne_sha/`](examples/mutual_quine_ne_sha/README.md).
+
+### mutual_quine_ne_pcrs — mutual quine as AWS Nitro Enclaves (reference PCRs)
+
+The full scheme: the two EIFs are built *reproducibly*, and each enclave *rebuilds the other enclave's image inside itself at runtime* and prints the peer's reference **PCR values** — the measurements the Nitro hypervisor attests — derived intrinsically, with no network and no shared state.
+
+Running this one requires an **EC2 instance with AWS Nitro Enclaves enabled** and ample resources — it builds the EIFs on the host and each enclave rebuilds its peer's EIF in RAM (the tested setups are `m6a.xlarge` for x86\_64 and `m6g.xlarge` for AArch64: 4 vCPUs / 16 GiB, of which 2 vCPUs / 8 GiB go to the enclave).
+See the full tutorial in [`examples/mutual_quine_ne_pcrs/`](examples/mutual_quine_ne_pcrs/README.md) for the instance prerequisites, host setup, and a step-by-step walk-through.
 
 ## Tests
 
@@ -141,4 +149,5 @@ nix flake check -L
 ```
 
 For each example this transpiles the template from scratch, asserts the output is byte-identical to the committed node files, evaluates the emitted nodes and asserts their quine property (self-reproduction / peer digests).
-For `mutual_quine_ne` the `mutual-quine-ne-verify-*` checks additionally re-run the enclave entrypoint against each image's rootfs and demand that the EIF it reconstructs for its peer matches the peer's actual build — the mutual-quine property is proven without Nitro hardware.
+
+For the Nitro Enclave examples the `mutual-quine-ne-sha-verify-*` and `mutual-quine-ne-pcrs-verify-*` checks additionally re-run the enclave entrypoint against each image's rootfs and demand that what it reconstructs for its peer — the peer's source and SHA-384 digest (`_sha`), or the peer's EIF and PCRs (`_pcrs`) — matches the peer's actual build; the mutual-quine property is proven without Nitro hardware.

@@ -17,7 +17,8 @@
 #
 # Tunables (env vars):
 #   ALLOCATOR_MEMORY_MIB  memory reserved for enclaves (default 8192 -- the
-#                         mutual_quine_ne enclaves rebuild an EIF in RAM)
+#                         mutual_quine_ne_pcrs enclaves rebuild an EIF in RAM;
+#                         mutual_quine_ne_sha gets by with far less, e.g. 2048)
 #   ALLOCATOR_CPU_COUNT   CPUs reserved for enclaves   (default 2)
 
 set -euo pipefail

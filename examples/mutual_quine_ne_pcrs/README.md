@@ -1,4 +1,6 @@
-# Mutual Quine as two AWS Nitro Enclaves
+# Mutual Quine as two AWS Nitro Enclaves — PCRs edition
+
+> Looking for a gentler start? [`mutual_quine_ne_sha`](../mutual_quine_ne_sha/README.md) is the lighter sibling of this example: the enclaves only compute the SHA-384 digest of each other's *source*, without the in-enclave EIF rebuild performed here.
 
 This tutorial builds **two Nitro Enclave image files (EIFs)** such that, at runtime, *each enclave prints the reference PCR values of the other* — without ever talking to the other enclave, the host, or the network.
 Everything an enclave needs to know about its peer is embedded in its own image.
@@ -161,14 +163,14 @@ A different lock — like a different architecture — will produce different (s
 From the repo root:
 
 ```bash
-nix build .#mutual-quine-ne-nodes -o nodes
+nix build .#mutual-quine-ne-pcrs-nodes -o nodes
 cat nodes/node___ENCLAVE1.nix
 ```
 
 You can also run the transpiler directly, without Nix:
 
 ```bash
-PYTHONPATH=src python3 -m nixreflect examples/mutual_quine_ne/template.json out/
+PYTHONPATH=src python3 -m nixreflect examples/mutual_quine_ne_pcrs/template.json out/
 ```
 
 Each node evaluates to `{ self, peer, selfSource, peerSource, peerSourceSha256 }`, reconstructed entirely from the JSON blob embedded in the node itself.
@@ -176,8 +178,8 @@ Each node evaluates to `{ self, peer, selfSource, peerSource, peerSourceSha256 }
 ### Step 2 — EIF build
 
 ```bash
-nix build .#mutual-quine-ne-eif1 -o eif1
-nix build .#mutual-quine-ne-eif2 -o eif2
+nix build .#mutual-quine-ne-pcrs-eif1 -o eif1
+nix build .#mutual-quine-ne-pcrs-eif2 -o eif2
 
 cat eif1/pcr.json   # node1's reference PCRs
 cat eif2/pcr.json   # node2's reference PCRs
@@ -191,8 +193,8 @@ Note `nix build` will always reproduce the same `image.eif` and `pcr.json` — t
 The flake ships checks that re-run **the exact enclave entrypoint** against each image's pristine rootfs and compare the PCRs it reconstructs for its peer with the peer's actual build:
 
 ```bash
-nix build .#checks.$(nix eval --raw --impure --expr builtins.currentSystem).mutual-quine-ne-verify-1-rebuilds-2
-nix build .#checks.$(nix eval --raw --impure --expr builtins.currentSystem).mutual-quine-ne-verify-2-rebuilds-1
+nix build .#checks.$(nix eval --raw --impure --expr builtins.currentSystem).mutual-quine-ne-pcrs-verify-1-rebuilds-2
+nix build .#checks.$(nix eval --raw --impure --expr builtins.currentSystem).mutual-quine-ne-pcrs-verify-2-rebuilds-1
 # or simply:
 nix flake check
 ```
@@ -216,7 +218,7 @@ nitro-cli console --enclave-id "$(nitro-cli describe-enclaves | jq -r '.[0].Encl
 
 After boot, enclave 1 evaluates its quine, rebuilds its peer, and prints:
 
-```
+```console
 ==[ NixReflect mutual quine -- Nitro Enclave edition ]==
 warning: the group 'nixbld' specified in 'build-users-group' does not exist
 self: __ENCLAVE1
@@ -252,7 +254,7 @@ nitro-cli run-enclave \
 nitro-cli console --enclave-id "$(nitro-cli describe-enclaves | jq -r '.[0].EnclaveID')"
 ```
 
-```
+```console
 ==[ NixReflect mutual quine -- Nitro Enclave edition ]==
 warning: the group 'nixbld' specified in 'build-users-group' does not exist
 self: __ENCLAVE2

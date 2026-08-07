@@ -5,10 +5,11 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     # NOTE: nitro-util's own nixpkgs pin is deliberately NOT overridden with
-    # `follows`: the mutual_quine_ne example takes every tool that ends up
-    # inside the enclaves from nitro-util's pkgs, so the binaries that pack the
-    # ramdisks at build time and the binaries that re-pack them inside the
-    # enclaves are the exact same store paths.
+    # `follows`: the mutual_quine_ne_{sha,pcrs} examples take every tool that
+    # ends up inside the enclaves from nitro-util's pkgs, so the binaries that
+    # pack the ramdisks at build time and the binaries that re-pack them
+    # inside the enclaves (mutual_quine_ne_pcrs) are the exact same store
+    # paths.
     nitro-util.url = "github:monzo/aws-nitro-util";
   };
 
@@ -39,21 +40,32 @@
       # the Linux system matching the enclave's architecture
       (flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
         let
-          mq = import ./examples/mutual_quine_ne {
-            nitro = nitro-util.lib.${system};
+          nitro = nitro-util.lib.${system};
+          eifInit = nitro-util.packages.${system}.eif-init;
+          # in-enclave SHA-384 of the peer's source only; no rebuild inside
+          mqSha = import ./examples/mutual_quine_ne_sha {
+            inherit nitro eifInit;
+          };
+          # full in-enclave rebuild of the peer's EIF, yielding its PCRs
+          mqPcrs = import ./examples/mutual_quine_ne_pcrs {
+            inherit nitro eifInit;
             eifBuild = nitro-util.packages.${system}.eif_build;
-            eifInit = nitro-util.packages.${system}.eif-init;
           };
         in
         {
           packages = {
-            mutual-quine-ne-nodes = mq.nodes;
-            mutual-quine-ne-eif1 = mq.eifs.node1;
-            mutual-quine-ne-eif2 = mq.eifs.node2;
+            mutual-quine-ne-sha-nodes = mqSha.nodes;
+            mutual-quine-ne-sha-eif1 = mqSha.eifs.node1;
+            mutual-quine-ne-sha-eif2 = mqSha.eifs.node2;
+            mutual-quine-ne-pcrs-nodes = mqPcrs.nodes;
+            mutual-quine-ne-pcrs-eif1 = mqPcrs.eifs.node1;
+            mutual-quine-ne-pcrs-eif2 = mqPcrs.eifs.node2;
           };
           checks = {
-            mutual-quine-ne-verify-1-rebuilds-2 = mq.verify.node1;
-            mutual-quine-ne-verify-2-rebuilds-1 = mq.verify.node2;
+            mutual-quine-ne-sha-verify-1-hashes-2 = mqSha.verify.node1;
+            mutual-quine-ne-sha-verify-2-hashes-1 = mqSha.verify.node2;
+            mutual-quine-ne-pcrs-verify-1-rebuilds-2 = mqPcrs.verify.node1;
+            mutual-quine-ne-pcrs-verify-2-rebuilds-1 = mqPcrs.verify.node2;
           };
         }));
 }
