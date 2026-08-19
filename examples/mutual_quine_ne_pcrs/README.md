@@ -124,7 +124,8 @@ Verified end to end on both **x86\_64** and **AArch64**: both enclaves booted on
 | AMI | `ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-amd64-server-20260604` (`ami-0e5497a77ef21b5ac`, us-east-2) |
 | OS / Kernel | Ubuntu 26.04 LTS / 7.0.0-1006-aws |
 | Storage | 64 GiB |
-| Enclave allocator | `memory_mib: 8192`, `cpu_count: 2` (2 of the 4 vCPUs reserved for enclaves) |
+| Enclave allocator pool | `memory_mib: 8192`, `cpu_count: 2` |
+| Per-enclave allocation | `--memory 8192 --cpu-count 2` |
 | nitro-cli | 1.4.5 (commit `18a5f6f35f110c0f235f193ae3caff9434d64ee1`) |
 | Docker | 29.1.3 (`docker.io` 29.1.3-0ubuntu4.1) |
 | Nix (host) | Determinate Nix 3.21.8 (Nix 2.34.8), flakes enabled |
@@ -137,7 +138,8 @@ Verified end to end on both **x86\_64** and **AArch64**: both enclaves booted on
 | AMI | `ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-arm64-server-20260604` (`ami-04d0f56e9ce314a8e`, us-east-2) |
 | OS / Kernel | Ubuntu 26.04 LTS / 7.0.0-1010-aws |
 | Storage | 64 GiB |
-| Enclave allocator | `memory_mib: 2048`, `cpu_count: 2` (2 of the 4 vCPUs reserved for enclaves) |
+| Enclave allocator pool | `memory_mib: 8192`, `cpu_count: 2` |
+| Per-enclave allocation | `--memory 2048 --cpu-count 2` |
 | nitro-cli | 1.4.5 (commit `18a5f6f35f110c0f235f193ae3caff9434d64ee1`) |
 | Docker | 29.1.3 (`docker.io` 29.1.3-0ubuntu4.1) |
 | Nix (host) | Determinate Nix 3.21.8 (Nix 2.34.8), flakes enabled |
