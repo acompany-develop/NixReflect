@@ -1,7 +1,5 @@
 # Mutual Quine as two AWS Nitro Enclaves — PCRs edition
 
-> Looking for a gentler start? [`mutual_quine_ne_sha`](../mutual_quine_ne_sha/README.md) is the lighter sibling of this example: the enclaves only compute the SHA-384 digest of each other's *source*, without the in-enclave EIF rebuild performed here.
-
 This tutorial builds **two Nitro Enclave image files (EIFs)** such that, at runtime, *each enclave prints the reference PCR values of the other* — without ever talking to the other enclave, the host, or the network.
 Everything an enclave needs to know about its peer is embedded in its own image.
 It is established by combining:
@@ -115,7 +113,7 @@ The whole scheme stands on the EIF build being a *pure, pinned* function:
 
 ### Tested environment
 
-Last verified end to end on **2026-07-29**, on both **x86\_64** and **AArch64**: both enclaves booted on real Nitro hardware, and the PCRs each reconstructed for its peer matched both the peer's build-time `pcr.json` and the values the hypervisor reports (`nitro-cli describe-enclaves --metadata`) for a non-debug run of the peer.
+Verified end to end on both **x86\_64** and **AArch64**: both enclaves booted on real Nitro hardware, and the PCRs each reconstructed for its peer matched both the peer's build-time `pcr.json` and the values the hypervisor reports (`nitro-cli describe-enclaves --metadata`) for a non-debug run of the peer.
 (PCR values are architecture-specific; the sample outputs under [Run](#run) are from the AArch64 host.)
 
 #### x86\_64 host
@@ -137,9 +135,9 @@ Last verified end to end on **2026-07-29**, on both **x86\_64** and **AArch64**:
 | --- | --- |
 | Instance type | `m6g.xlarge` (4 vCPU / 16 GiB RAM; AWS Graviton2, Neoverse-N1, 1 thread/core), **Nitro Enclaves: enabled** |
 | AMI | `ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-arm64-server-20260604` (`ami-04d0f56e9ce314a8e`, us-east-2) |
-| OS / Kernel | Ubuntu 26.04 LTS / 7.0.0-1006-aws |
+| OS / Kernel | Ubuntu 26.04 LTS / 7.0.0-1010-aws |
 | Storage | 64 GiB |
-| Enclave allocator | `memory_mib: 8192`, `cpu_count: 2` (2 of the 4 vCPUs reserved for enclaves) |
+| Enclave allocator | `memory_mib: 2048`, `cpu_count: 2` (2 of the 4 vCPUs reserved for enclaves) |
 | nitro-cli | 1.4.5 (commit `18a5f6f35f110c0f235f193ae3caff9434d64ee1`) |
 | Docker | 29.1.3 (`docker.io` 29.1.3-0ubuntu4.1) |
 | Nix (host) | Determinate Nix 3.21.8 (Nix 2.34.8), flakes enabled |
