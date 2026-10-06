@@ -210,7 +210,7 @@ The sample outputs below are actual values measured on the AArch64 host of the [
 ```bash
 nitro-cli run-enclave \
   --eif-path eif1/image.eif \
-  --memory 8192 --cpu-count 2 \
+  --memory 2048 --cpu-count 2 \
   --debug-mode
 
 nitro-cli console --enclave-id "$(nitro-cli describe-enclaves | jq -r '.[0].EnclaveID')"
